@@ -10,8 +10,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-    runs-on: ubuntu-20.04
+  build-ubuntu:
+    runs-on: ubuntu-22.04
     steps:
     - name: Install latest stable rustc
       uses: actions-rs/toolchain@v1
@@ -45,3 +45,36 @@ jobs:
         name: zee-linux-amd64-0.3.2
         # A file, directory or wildcard pattern that describes what to upload
         path: ./target/release/zee
+  build-windows:
+    runs-on: windows-2022
+    steps:
+    - name: Install latest stable rustc
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+        components: rustfmt, clippy
+    - name: Install nightly rustfmt
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: nightly
+        override: false
+        components: rustfmt
+    - name: Checkout repository
+      uses: actions/checkout@v2
+#     - name: Run checks
+#       run: ./scripts/check
+    - name: Build
+      run: |
+        # ./scripts/build
+        cargo build --release
+        tree ./target
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        # Artifact name
+        name: zee-windows-amd64-0.3.2
+        # A file, directory or wildcard pattern that describes what to upload
+        path: ./target/release/zee.exe
